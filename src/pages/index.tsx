@@ -1,31 +1,12 @@
 import { Box, Text, Center, Image } from '@chakra-ui/react';
-
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-
-import { App } from '../services/firebase';
+import { useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
 
 
 
 export default function Home() {
 
-
-  async function signInWithGoogle() {
-    App
-    const provider = new GoogleAuthProvider();
-    const auth = getAuth();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        const user = result.user;
-        console.log(user)
-      }).catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.email;
-        const credential = GoogleAuthProvider.credentialFromError(error);
-      });
-  }
+  const { signInWithGoogle } = useContext(AuthContext);
 
   return (
     <Center h="100vh" maxW="100vw" w="100%" bg="#46BCFF">
