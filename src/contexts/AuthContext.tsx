@@ -6,11 +6,12 @@ interface User {
   uid: string,
   displayName: string | null,
   email: string | null,
+  photoURL: string,
 }
 
 interface AuthContextProps {
-  user: User,
-  signInWithGoogle: () => void
+  user: User | undefined,
+  signInWithGoogle: () => Promise<void>
 }
 
 interface AuthContextProviderProps {
@@ -26,32 +27,45 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
   useEffect(() => {
     App
     const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const { uid, displayName, email } = user;
+        const { uid, displayName, email, photoURL } = user;
+
+        if (!displayName || !photoURL) {
+          throw new Error('Missing information from Google Account.');
+        }
+        setUser({
+          uid: uid,
+          displayName: displayName,
+          email: email,
+          photoURL: photoURL,
+        })
       }
-      setUser({
-        uid: uid,
-        displayName: displayName,
-        email: email,
-      })
+      unsubscribe();
     })
+
+
   }, []);
 
   async function signInWithGoogle() {
 
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
-    signInWithPopup(auth, provider)
+    await signInWithPopup(auth, provider)
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
         if (result.user) {
-          const { uid, displayName, email } = result.user;
+          const { uid, displayName, email, photoURL } = result.user;
+          if (!displayName || !photoURL) {
+            throw new Error('Missing information from Google Account.');
+          }
           setUser({
             uid: uid,
             displayName: displayName,
             email: email,
+            photoURL: photoURL,
           })
         }
       }).catch((error) => {
