@@ -44,11 +44,13 @@ export function Menu() {
           w="100%"
           p={3}
           borderRadius="17px"
+          bg={router.asPath === '/dashboard/transactions' ? "#3C485C" : 'none'}
           _hover={{ backgroundColor: "#3C485C", cursor: "pointer" }}
           sx={{ transition: '0.3s' }}
+          onClick={() => { router.push('/dashboard/transactions') }}
         >
-          <Icon as={PlusSquare} pr={2} w={7} h={7} />
-          <Text fontWeight="semibold" >Transaction</Text>
+          <Icon as={PlusSquare} pr={2} w={7} h={7} color={router.asPath === '/dashboard/transactions' ? "#46BCFF" : 'none'} />
+          <Text fontWeight="semibold" color={router.asPath === '/dashboard/transactions' ? "#46BCFF" : 'none'}>Transaction</Text>
         </Flex>
 
       </VStack>
