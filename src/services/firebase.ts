@@ -1,5 +1,7 @@
 
 import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set, push } from "firebase/database";
+
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -11,6 +13,8 @@ const firebaseConfig = {
 };
 
 const App = initializeApp(firebaseConfig);
+const database = getDatabase(App);
 
 
-export { App }
+
+export { App, database, ref, set, push }
