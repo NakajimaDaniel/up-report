@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, Input, Select, VStack } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, Input, Select, Text, VStack } from "@chakra-ui/react";
 import { Formik, Form, Field } from "formik";
 import { useContext, useState } from "react";
 import { ArrowDown, ArrowUp } from "react-feather";
@@ -12,23 +12,15 @@ interface Transaction {
   dt: number;
   description: string;
   category: string;
-  type: "Expense" | "Income";
+  type: "Expense" | "Income" | undefined;
   value: string;
 }
-
-interface UserData {
-  userId: string;
-  name: string;
-  email: string;
-  transaction: Transaction;
-}
-
 
 export default function Transactions() {
 
 
   const { user } = useContext(AuthContext);
-  const [newTrasaction, setNewTrasaction] = useState({} as Transaction);
+  const [newTransaction, setNewTransaction] = useState({} as Transaction);
   const [transactionType, setTransactionType] = useState<"Expense" | "Income">();
 
 
@@ -49,7 +41,7 @@ export default function Transactions() {
     }
   }
 
-  async function writeUserData({ userId, name, email, transaction }: UserData) {
+  async function registerNewTransaction(transaction: Transaction) {
     const db = database;
 
     if (!user) {
@@ -59,21 +51,22 @@ export default function Transactions() {
     const monthName = getMonthName(new Date().getMonth());
     const year = new Date().getFullYear();
 
-    await set(ref(db, 'users/' + userId), {
-      userName: name,
-      userEmail: email,
+    await set(ref(db, 'users/' + user.uid), {
+      userName: user.displayName,
+      userEmail: user.email,
     });
 
 
     const transactionListRef = ref(db, `users/transactions/${year}/${monthName}`);
     const newTransactionRef = push(transactionListRef);
     set(newTransactionRef, {
-      dt: Date.parse(new Date),
-      description: newTrasaction.description,
-      category: newTrasaction.category,
-      type: newTrasaction.type,
-      value: newTrasaction.value,
+      dt: transaction.dt,
+      description: transaction.description,
+      category: transaction.category,
+      type: transaction.type,
+      value: transaction.value,
     })
+
 
   }
 
@@ -126,10 +119,8 @@ export default function Transactions() {
           initialValues={{ description: '', category: '', value: '' }}
 
           onSubmit={(values, actions) => {
-
-            setNewTrasaction({ type: transactionType, dt: Date.parse(new Date), ...values });
-            //writeUserData(user.uid, user.displayName, user.email, newTrasaction)
-            console.log(newTrasaction);
+            setNewTransaction({ type: transactionType, dt: Date.parse(new Date), ...values });
+            registerNewTransaction(newTransaction);
           }}
 
         >
@@ -196,7 +187,7 @@ export default function Transactions() {
                         <Icon as={ArrowUp} w={7} h={7} color="#5FF099" />
                       </Flex>
                     </Flex>
-                    <FormErrorMessage>{form.errors.transactionType}</FormErrorMessage>
+                    {form.errors.transactionType ? <Text color="red.300" fontSize={"sm"} >{form.errors.transactionType}</Text> : ''}
                   </FormControl>
                 )}
               </Field>
@@ -217,12 +208,8 @@ export default function Transactions() {
 
             </Form>
           </Box>
-
         </Formik>
-
       </VStack>
-
-
     </Container >
   )
 }
