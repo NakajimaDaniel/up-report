@@ -2,6 +2,7 @@ import { Box, Container, HStack, Text, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 import { Header } from "../../../components/Header";
 import { Menu } from "../../../components/Menu";
+import { RegisterNewCategoryForm } from "../../../components/RegisterNewCategoryForm";
 import { RegisterNewTransactionForm } from "../../../components/RegisterNewTransactionForm";
 
 
@@ -30,7 +31,7 @@ export default function Transactions() {
 
       </HStack>
       {selectRegisterOption == "newTransaction" ?
-        <RegisterNewTransactionForm /> : <Container></Container>
+        <RegisterNewTransactionForm /> : <RegisterNewCategoryForm />
       }
 
     </Container>
