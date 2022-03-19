@@ -53,6 +53,8 @@ export function RegisterNewCategoryForm() {
           set(newCategoryListRef, {
             category,
           })
+
+          alert("Category register successfully");
         }
 
       } else {
@@ -64,6 +66,7 @@ export function RegisterNewCategoryForm() {
         set(newCategoryListRef, {
           category,
         })
+        alert("Category register successfully");
       }
     }).catch((error) => {
       console.error(error);
