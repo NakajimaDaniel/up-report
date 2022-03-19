@@ -3,7 +3,7 @@ import { Formik, Form, Field } from "formik";
 import { useContext, useState } from "react";
 import { ArrowDown, ArrowUp } from "react-feather";
 import { AuthContext } from "../../contexts/AuthContext";
-import { database, ref, set, push, onValue } from "../../services/firebase";
+import { database, ref, set, push, onValue, get, child, getDatabase } from "../../services/firebase";
 
 interface Category {
   category: string;
@@ -13,44 +13,62 @@ export function RegisterNewCategoryForm() {
 
   const { user } = useContext(AuthContext);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [newCategory, setNewCategory] = useState({} as Category);
   const [isCategoryAlreadyExist, setIsCategoryAlreadyExist] = useState(false);
 
-  async function RegisterNewCategoryOnFirebase(category: string) {
+
+  async function handleSubmit(values, actions) {
     const db = database;
+
+    setIsLoading(true);
 
     if (!user) {
       throw new Error('you must be logged in')
     }
 
-
-
-
-    const starCountRef = ref(db, `users/categories`);
-    onValue(starCountRef, (snapshot) => {
-      const data = snapshot.val();
-      const test = Object.entries(data).map(([key, value]) => { return value })
-
-      const found = test.find(element => element.category === newCategory.category)
-
-      if (found) {
-        setIsCategoryAlreadyExist(true);
-      }
+    await set(ref(db, 'users/' + user.uid), {
+      userName: user.displayName,
+      userEmail: user.email,
     });
 
-    // await set(ref(db, 'users/' + user.uid), {
-    //   userName: user.displayName,
-    //   userEmail: user.email,
-    // });
 
-    // const categoryListRef = ref(db, `users/categories`);
-    // const newCategoryListRef = push(categoryListRef);
-    // set(newCategoryListRef, {
-    //   category,
-    // })
+    const dbRef = ref(getDatabase());
+    get(child(dbRef, `users/categories`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const test = Object.entries(data).map(([key, value]) => { return value });
 
+        const names = test.map(el => el.category)
 
+        const isExists = (names.includes(values.category));
 
+        if (isExists) {
+          actions.setFieldError("category", "Category already exist");
+        } else {
+          const category = values.category;
+
+          const categoryListRef = ref(db, `users/categories`);
+          const newCategoryListRef = push(categoryListRef);
+          set(newCategoryListRef, {
+            category,
+          })
+        }
+
+      } else {
+
+        const category = values.category;
+
+        const categoryListRef = ref(db, `users/categories`);
+        const newCategoryListRef = push(categoryListRef);
+        set(newCategoryListRef, {
+          category,
+        })
+      }
+    }).catch((error) => {
+      console.error(error);
+    })
+    setIsLoading(false);
   }
 
 
@@ -68,14 +86,7 @@ export function RegisterNewCategoryForm() {
 
       <Formik
         initialValues={{ category: '' }}
-
-        onSubmit={(values, actions) => {
-          setNewCategory(values);
-          RegisterNewCategoryOnFirebase(values['category']);
-          if (isCategoryAlreadyExist) {
-            actions.setFieldError("category", "Category already exist");
-          }
-        }}
+        onSubmit={(values, actions) => { handleSubmit(values, actions) }}
 
       >
         <Box w="50%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
@@ -91,7 +102,7 @@ export function RegisterNewCategoryForm() {
               )}
             </Field>
 
-            <Button type='submit' isLoading={false} mb={5} >
+            <Button type='submit' isLoading={isLoading} mb={5} >
               Submit
             </Button>
 
