@@ -1,9 +1,9 @@
 import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, Input, Select, Text, VStack } from "@chakra-ui/react";
 import { Formik, Form, Field } from "formik";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp } from "react-feather";
 import { AuthContext } from "../../contexts/AuthContext";
-import { database, ref, set, push } from "../../services/firebase";
+import { database, ref, set, push, getDatabase, get, child } from "../../services/firebase";
 
 interface Transaction {
   dt: number;
@@ -19,6 +19,8 @@ export function RegisterNewTransactionForm() {
   const { user } = useContext(AuthContext);
   const [newTransaction, setNewTransaction] = useState({} as Transaction);
   const [transactionType, setTransactionType] = useState<"Expense" | "Income">();
+  const [categoryNames, setCategoryNames] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
 
   function getMonthName(monthNumber: number) {
@@ -36,35 +38,6 @@ export function RegisterNewTransactionForm() {
       case 10: return "November";
       case 11: return "Dezember";
     }
-  }
-
-  async function registerNewTransaction(transaction: Transaction) {
-    const db = database;
-
-    if (!user) {
-      throw new Error('you must be logged in')
-    }
-
-    const monthName = getMonthName(new Date().getMonth());
-    const year = new Date().getFullYear();
-
-    await set(ref(db, 'users/' + user.uid), {
-      userName: user.displayName,
-      userEmail: user.email,
-    });
-
-
-    const transactionListRef = ref(db, `users/transactions/${year}/${monthName}`);
-    const newTransactionRef = push(transactionListRef);
-    set(newTransactionRef, {
-      dt: transaction.dt,
-      description: transaction.description,
-      category: transaction.category,
-      type: transaction.type,
-      value: transaction.value,
-    })
-
-
   }
 
 
@@ -102,7 +75,57 @@ export function RegisterNewTransactionForm() {
     return error
   }
 
+  async function handleSubmit(values, actions) {
+    const db = database;
 
+    setIsLoading(true);
+
+    if (!user) {
+      throw new Error('you must be logged in')
+    }
+
+    await set(ref(db, 'users/' + user.uid), {
+      userName: user.displayName,
+      userEmail: user.email,
+    });
+
+    const monthName = getMonthName(new Date().getMonth());
+    const year = new Date().getFullYear();
+
+    const transactionListRef = ref(db, `users/transactions/${year}/${monthName}`);
+    const newTransactionRef = push(transactionListRef);
+    set(newTransactionRef, {
+      dt: Date.parse(new Date),
+      description: values.description,
+      category: values.category,
+      type: transactionType,
+      value: values.value,
+    })
+
+    setIsLoading(false);
+
+  }
+
+
+  useEffect(() => {
+
+    const dbRef = ref(getDatabase());
+    get(child(dbRef, `users/categories`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const test = Object.entries(data).map(([key, value]) => { return value });
+
+        const names = test.map(el => el);
+        setCategoryNames(names);
+
+      }
+
+    }).catch((error) => {
+      console.error(error);
+    })
+
+
+  }, [])
 
   return (
     <VStack mr="200px" ml="200px" pb={10} alignItems="center">
@@ -110,10 +133,7 @@ export function RegisterNewTransactionForm() {
       <Formik
         initialValues={{ description: '', category: '', value: '' }}
 
-        onSubmit={(values, actions) => {
-          setNewTransaction({ type: transactionType, dt: Date.parse(new Date), ...values });
-          registerNewTransaction(newTransaction);
-        }}
+        onSubmit={(values, actions) => { handleSubmit(values, actions) }}
 
       >
         <Box w="50%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
@@ -133,8 +153,14 @@ export function RegisterNewTransactionForm() {
                 <FormControl isInvalid={form.errors.category && form.touched.category}>
                   <FormLabel>Category</FormLabel>
                   <Select placeholder='Select category' id="category" {...field}>
-                    <option>Personal Care</option>
-                    <option>Electronics</option>
+                    {categoryNames ?
+                      categoryNames.map(val => (
+                        <option key={val.category}>{val.category}</option>
+                      ))
+                      :
+                      (<div></div>)
+                    }
+
                   </Select>
                   <FormErrorMessage>{form.errors.category}</FormErrorMessage>
                 </FormControl>
@@ -194,7 +220,7 @@ export function RegisterNewTransactionForm() {
               )}
             </Field>
 
-            <Button type='submit' isLoading={false} mb={5} >
+            <Button type='submit' isLoading={isLoading} mb={5} >
               Submit
             </Button>
 
