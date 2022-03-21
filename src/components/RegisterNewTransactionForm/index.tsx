@@ -92,7 +92,7 @@ export function RegisterNewTransactionForm() {
     const monthName = getMonthName(new Date().getMonth());
     const year = new Date().getFullYear();
 
-    const transactionListRef = ref(db, `users/transactions/${year}/${monthName}`);
+    const transactionListRef = ref(db, `users/transactions/`);
     const newTransactionRef = push(transactionListRef);
     set(newTransactionRef, {
       dt: Date.parse(new Date),
@@ -100,6 +100,14 @@ export function RegisterNewTransactionForm() {
       category: values.category,
       type: transactionType,
       value: values.value,
+    })
+
+    alert("Product/ transaction registered");
+
+    actions.resetForm({
+      values: {
+        description: '', category: '', value: ''
+      }
     })
 
     setIsLoading(false);
@@ -158,7 +166,7 @@ export function RegisterNewTransactionForm() {
                         <option key={val.category}>{val.category}</option>
                       ))
                       :
-                      (<div></div>)
+                      (<option></option>)
                     }
 
                   </Select>
