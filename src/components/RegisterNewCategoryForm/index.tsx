@@ -55,6 +55,13 @@ export function RegisterNewCategoryForm() {
           })
 
           alert("Category register successfully");
+
+          actions.resetForm({
+            values: {
+              category: '',
+            }
+          })
+
         }
 
       } else {
@@ -67,6 +74,13 @@ export function RegisterNewCategoryForm() {
           category,
         })
         alert("Category register successfully");
+
+        actions.resetForm({
+          values: {
+            category: '',
+          }
+        })
+
       }
     }).catch((error) => {
       console.error(error);
