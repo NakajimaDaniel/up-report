@@ -43,7 +43,7 @@ export default function Dashboard() {
 
       <HStack mr="200px" ml="200px" pb={10} alignItems="center">
         <MonthBalanceCard user={user} transactions={listOfTransactions} />
-        <TotalExpenseByCategoryCard />
+        <TotalExpenseByCategoryCard transactions={listOfTransactions} />
       </HStack>
 
       <VStack mr="200px" ml="200px" pb={10} alignItems="center">
