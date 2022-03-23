@@ -120,7 +120,7 @@ export function MonthBalanceCard({ user, transactions }: MonthBalanceCardProps) 
       </Flex>
 
 
-      <Text fontWeight="light" position="relative" bottom="0" right="0" fontSize={13}>Last update {actualDateAndTime}</Text>
+      <Text fontWeight="light" position="relative" bottom="0" right="0" fontSize={13}>Last update 21 Fev 2022 10:10:15</Text>
     </Container>
   )
 }
