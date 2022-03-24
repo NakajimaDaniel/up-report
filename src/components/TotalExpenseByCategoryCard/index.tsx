@@ -85,7 +85,7 @@ export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardPro
         {transactions ? (
           totalSumByCategory.map(val => {
             return (
-              <Flex align="center" pb={4} >
+              <Flex align="center" pb={4} key={val.category} >
                 <Text fontWeight="medium" fontSize={16} >{val.category}</Text>
                 <Spacer />
                 <Text fontWeight="medium" fontSize={16} color="#EB4335" >R$ -{val.value}</Text>
