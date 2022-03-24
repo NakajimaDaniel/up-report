@@ -47,7 +47,7 @@ export default function Dashboard() {
       </HStack>
 
       <VStack mr="200px" ml="200px" pb={10} alignItems="center">
-        <LatestExpensesCard />
+        <LatestExpensesCard transactions={listOfTransactions} />
       </VStack>
 
 
