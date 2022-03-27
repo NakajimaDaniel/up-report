@@ -126,11 +126,9 @@ const series = [
 export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) {
 
   const [selectedYear, setSelectedYear] = useState();
-  const [listOfExpenseByMonth, setListOfExpenseByMonth] = useState(2022);
+  const [listByMonth, setListByMonth] = useState();
+  const [balanceArrayValue, setBalanceArrayValue] = useState();
 
-  const transactionDateList = transactions?.map(val => {
-    return format(val.dt, "MMM/yy")
-  })
 
   const newTransactionList = transactions?.map(val => {
     return {
@@ -173,24 +171,28 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
   }
 
 
+
   useEffect(() => {
+
     const allExpenses = retrieveAllExpense(selectedYear);
     const allIncomes = retriveAllIncomes(selectedYear);
 
     const monthsOfAllExpenses = allExpenses?.map(val => { return val.month })
     const monthsOfAllIncomes = allIncomes?.map(val => { return val.month })
 
-    // const arrayOfMonthsFiltered = allExpensesByMonth?.filter((item, position) => {
-    //   return allExpensesByMonth.indexOf(item) == position
-    // })
+    const monthsOfAllExpensesFiltered = monthsOfAllExpenses?.filter((item, position) => {
+      return monthsOfAllExpenses.indexOf(item) == position
+    })
+
+    const monthsOfAllIncomesFiltered = monthsOfAllIncomes?.filter((item, position) => {
+      return monthsOfAllIncomes.indexOf(item) == position
+    })
 
     const totalByMonth = (array) => {
       return array?.reduce((total, item) => {
         total[item.month] = array.reduce((acc, obj) => {
           if (obj.month == item.month) {
             acc = acc + Number(obj.value)
-          } else {
-            console.log(array)
           }
           return acc
         }, 0)
@@ -199,21 +201,58 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
     }
 
 
+
     const totalExpenses = totalByMonth(allExpenses);
     const totalIncomes = totalByMonth(allIncomes);
 
-    console.log(totalIncomes)
+    if (monthsOfAllExpensesFiltered && monthsOfAllIncomesFiltered) {
+      if (monthsOfAllExpensesFiltered.length > monthsOfAllIncomesFiltered.length) {
+        const newmap = monthsOfAllExpensesFiltered.map(val => {
+          return {
+            month: val,
+            totalIncome: totalIncomes[val],
+            totalExpense: totalExpenses[val],
+          }
+        })
 
-    if (totalExpenses || totalIncomes) {
+        setListByMonth(newmap);
 
-      const newTotalExpense = Object.values(totalExpenses);
-      const newTotalIncome = Object.values(totalIncomes);
-
-      // const newarray = test?.map((valueA, indexInA) => valueA - test2[indexInA])
-
+      } else {
+        const newmap = monthsOfAllIncomesFiltered.map(val => {
+          return {
+            month: val,
+            totalIncome: totalIncomes[val],
+            totalExpense: totalExpenses[val],
+          }
+        })
+      }
     }
 
   }, [selectedYear]);
+
+
+  useEffect(() => {
+    const listOfIncomeByMonth = listByMonth?.map(val => {
+      if (!val.totalIncome) {
+        return 0
+      }
+      return val.totalIncome
+    })
+    const listOfExpenseByMonth = listByMonth?.map(val => {
+      if (!val.totalExpense) {
+        return 0
+      }
+      return val.totalExpense
+    })
+
+    const balance = listOfIncomeByMonth?.map((valueA, indexInA) => valueA - listOfExpenseByMonth[indexInA]);
+
+    setBalanceArrayValue(balance)
+
+  }, [listByMonth]);
+
+
+  console.log(balanceArrayValue);
 
   return (
     <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
