@@ -11,122 +11,19 @@ interface Transaction {
   value: string,
 }
 
+
+
 interface MonthlyBalanceGraphProps {
   transactions: Transaction[];
 }
 
-const Chart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-})
 
-
-const options = {
-  chart: {
-    toolbar: {
-      show: false,
-
-    },
-    zoom: {
-      enabled: false,
-
-    },
-  },
-  plotOptions: {
-    bar: {
-      // colors: {
-      //   ranges: [{
-      //     from: -100,
-      //     to: -46,
-      //     color: '#F15B46'
-      //   }, {
-      //     from: -45,
-      //     to: 0,
-      //     color: '#FEB019'
-      //   }]
-      // },
-      columnWidth: '70%',
-    }
-  },
-
-  grid: {
-    show: false,
-  },
-
-  dataLabels: {
-    enabled: false,
-  },
-
-  tooltip: {
-    enabled: true,
-    y: {
-      formatter: function (val) {
-        return "R$ " + val
-      }
-    },
-
-    theme: "dark",
-
-  },
-
-  xaxis: {
-    // type: 'datetime',
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',],
-    labels: {
-      show: true,
-      rotate: -45,
-      rotateAlways: false,
-      hideOverlappingLabels: true,
-      showDuplicates: false,
-      trim: false,
-      minHeight: undefined,
-      maxHeight: 120,
-      style: {
-        colors: '#fff',
-        fontSize: '12px',
-        fontFamily: 'Helvetica, Arial, sans-serif',
-        fontWeight: 400,
-        cssClass: 'apexcharts-xaxis-label',
-      },
-      offsetX: 0,
-      offsetY: 0,
-      format: undefined,
-      formatter: undefined,
-      datetimeUTC: true,
-      datetimeFormatter: {
-        year: 'yyyy',
-        month: "MMM 'yy",
-        day: 'dd MMM',
-        hour: 'HH:mm',
-      },
-    },
-  },
-
-  yaxis: {
-    show: false,
-
-  },
-
-  fill: {
-    opacity: 1,
-    colors: [function ({ value }: any) {
-      if (value < 0) {
-        return "#EB4335"
-      } else {
-        return "#5FF099"
-      }
-    }]
-  },
-
-}
-
-const series = [
-  { name: 'series1', data: [21, 120, 200, 20, 30, 40, -50] }
-]
 
 export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) {
 
-  const [selectedYear, setSelectedYear] = useState();
+  const [selectedYear, setSelectedYear] = useState(2022);
   const [listByMonth, setListByMonth] = useState();
+  const [monthsArray, setMonthsArray] = useState();
   const [balanceArrayValue, setBalanceArrayValue] = useState();
 
 
@@ -170,6 +67,61 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
     return total
   }
 
+  useEffect(() => {
+    const allExpenses = retrieveAllExpense(selectedYear);
+    const allIncomes = retriveAllIncomes(selectedYear);
+
+    const monthsOfAllExpenses = allExpenses?.map(val => { return val.month })
+    const monthsOfAllIncomes = allIncomes?.map(val => { return val.month })
+
+    const monthsOfAllExpensesFiltered = monthsOfAllExpenses?.filter((item, position) => {
+      return monthsOfAllExpenses.indexOf(item) == position
+    })
+
+    const monthsOfAllIncomesFiltered = monthsOfAllIncomes?.filter((item, position) => {
+      return monthsOfAllIncomes.indexOf(item) == position
+    })
+
+    const totalByMonth = (array) => {
+      return array?.reduce((total, item) => {
+        total[item.month] = array.reduce((acc, obj) => {
+          if (obj.month == item.month) {
+            acc = acc + Number(obj.value)
+          }
+          return acc
+        }, 0)
+        return total
+      }, {})
+    }
+
+    const totalExpenses = totalByMonth(allExpenses);
+    const totalIncomes = totalByMonth(allIncomes);
+
+    if (monthsOfAllExpensesFiltered && monthsOfAllIncomesFiltered) {
+      if (monthsOfAllExpensesFiltered.length > monthsOfAllIncomesFiltered.length) {
+        const newmap = monthsOfAllExpensesFiltered.map(val => {
+          return {
+            month: val,
+            totalIncome: totalIncomes[val],
+            totalExpense: totalExpenses[val],
+          }
+        })
+        setMonthsArray(monthsOfAllExpensesFiltered);
+        setListByMonth(newmap);
+
+      } else {
+        const newmap = monthsOfAllIncomesFiltered.map(val => {
+          return {
+            month: val,
+            totalIncome: totalIncomes[val],
+            totalExpense: totalExpenses[val],
+          }
+        })
+        setMonthsArray(monthsOfAllIncomesFiltered);
+        setListByMonth(newmap);
+      }
+    }
+  }, [])
 
 
   useEffect(() => {
@@ -200,8 +152,6 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
       }, {})
     }
 
-
-
     const totalExpenses = totalByMonth(allExpenses);
     const totalIncomes = totalByMonth(allIncomes);
 
@@ -214,7 +164,7 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
             totalExpense: totalExpenses[val],
           }
         })
-
+        setMonthsArray(monthsOfAllExpensesFiltered);
         setListByMonth(newmap);
 
       } else {
@@ -225,6 +175,8 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
             totalExpense: totalExpenses[val],
           }
         })
+        setMonthsArray(monthsOfAllIncomesFiltered);
+        setListByMonth(newmap);
       }
     }
 
@@ -232,6 +184,7 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
 
 
   useEffect(() => {
+
     const listOfIncomeByMonth = listByMonth?.map(val => {
       if (!val.totalIncome) {
         return 0
@@ -247,12 +200,97 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
 
     const balance = listOfIncomeByMonth?.map((valueA, indexInA) => valueA - listOfExpenseByMonth[indexInA]);
 
-    setBalanceArrayValue(balance)
+    setBalanceArrayValue(balance);
 
   }, [listByMonth]);
 
 
-  console.log(balanceArrayValue);
+  const Chart = dynamic(() => import('react-apexcharts'), {
+    ssr: false,
+  })
+
+  const options = {
+    chart: {
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+    },
+    plotOptions: {
+      bar: {
+        columnWidth: '70%',
+      }
+    },
+    grid: {
+      show: false,
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    tooltip: {
+      enabled: true,
+      y: {
+        formatter: function (val) {
+          return "R$ " + val
+        }
+      },
+      theme: "dark",
+    },
+
+    xaxis: {
+      // type: 'datetime',
+      categories: monthsArray ? monthsArray : ["null"],
+      labels: {
+        show: true,
+        rotate: -45,
+        rotateAlways: false,
+        hideOverlappingLabels: true,
+        showDuplicates: false,
+        trim: false,
+        minHeight: undefined,
+        maxHeight: 120,
+        style: {
+          colors: '#fff',
+          fontSize: '12px',
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          fontWeight: 400,
+          cssClass: 'apexcharts-xaxis-label',
+        },
+        offsetX: 0,
+        offsetY: 0,
+        format: undefined,
+        formatter: undefined,
+        datetimeUTC: true,
+        datetimeFormatter: {
+          year: 'yyyy',
+          month: "MMM 'yy",
+          day: 'dd MMM',
+          hour: 'HH:mm',
+        },
+      },
+    },
+    yaxis: {
+      show: false,
+
+    },
+    fill: {
+      opacity: 1,
+      colors: [function ({ value }: any) {
+        if (value < 0) {
+          return "#EB4335"
+        } else {
+          return "#5FF099"
+        }
+      }]
+    }
+  }
+
+  const series = [
+    { name: 'series1', data: balanceArrayValue ? balanceArrayValue : [0] }
+  ]
+
 
   return (
     <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
