@@ -94,7 +94,7 @@ export function MonthBalanceCard({ user, transactions }: MonthBalanceCardProps) 
       <Flex align="center" >
         <Text fontWeight="medium" fontSize={30} color="#5FF099" >R$</Text>
         <Spacer />
-        <Skeleton isLoaded={!!totalIncomeReduced} >
+        <Skeleton isLoaded={!!transactionsFormatted} >
           {transactions ? (<Text fontWeight="medium" fontSize={30} color="#5FF099" >{totalIncomeReduced.toFixed(2)}</Text>) : (<Container>0</Container>)}
         </Skeleton>
       </Flex>
@@ -102,7 +102,7 @@ export function MonthBalanceCard({ user, transactions }: MonthBalanceCardProps) 
       <Flex align="center" >
         <Text fontWeight="medium" fontSize={30} color="#EB4335" >R$</Text>
         <Spacer />
-        <Skeleton isLoaded={!!totalExpenseReduced} >
+        <Skeleton isLoaded={!!transactionsFormatted} >
           {transactions ? (<Text fontWeight="medium" fontSize={30} color="#EB4335" >-{totalExpenseReduced.toFixed(2)}</Text>) : (<Container>0</Container>)}
         </Skeleton>
       </Flex>
