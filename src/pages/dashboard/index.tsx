@@ -39,14 +39,12 @@ export default function Dashboard() {
     <Container w="100%" maxW="100vw" >
       <Header />
 
-      <Menu />
-
-      <HStack mr="200px" ml="200px" pb={10} alignItems="center">
+      <HStack mr={["200px", "200px", "250px", "300px"]} ml={["200px", "200px", "250px", "300px"]} pb={10} alignItems="center">
         <MonthBalanceCard user={user} transactions={listOfTransactions} />
         <TotalExpenseByCategoryCard transactions={listOfTransactions} />
       </HStack>
 
-      <VStack mr="200px" ml="200px" pb={10} alignItems="center">
+      <VStack mr={["200px", "200px", "250px", "300px"]} ml={["200px", "200px", "250px", "300px"]} pb={10} alignItems="center">
         <LatestExpensesCard transactions={listOfTransactions} />
       </VStack>
 
