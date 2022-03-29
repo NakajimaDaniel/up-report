@@ -1,6 +1,7 @@
 import { Box, Container, Flex, Image, Skeleton, SkeletonText, Spacer, Text } from "@chakra-ui/react";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
+import { Menu } from "../Menu";
 
 export function Header() {
 
@@ -8,6 +9,7 @@ export function Header() {
 
   return (
     <Container w="100%" maxW="100vw" p={[5]}>
+      <Menu />
       <Flex align="center">
         <Text color="white" fontWeight="bold" fontSize="30px" textAlign="center">UpReport</Text>
         <Spacer />
@@ -17,7 +19,6 @@ export function Header() {
         <Skeleton isLoaded={!!user} height='20px' startColor='pink.500' endColor='orange.500'>
           <Box w="150px" >{user?.displayName}</Box>
         </Skeleton>
-
       </Flex>
     </Container>
   )
