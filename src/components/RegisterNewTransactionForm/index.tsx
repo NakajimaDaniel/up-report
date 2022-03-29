@@ -1,4 +1,5 @@
 import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, Input, Select, Text, VStack } from "@chakra-ui/react";
+import { format } from "date-fns";
 import { Formik, Form, Field } from "formik";
 import { useContext, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp } from "react-feather";
@@ -89,7 +90,7 @@ export function RegisterNewTransactionForm() {
       userEmail: user.email,
     });
 
-    const monthName = getMonthName(new Date().getMonth());
+    const monthName = format(new Date(), "MMMM");
     const year = new Date().getFullYear();
 
     const transactionListRef = ref(db, `users/transactions/`);
@@ -101,6 +102,38 @@ export function RegisterNewTransactionForm() {
       type: transactionType,
       value: values.value,
     })
+
+    // const dbRef = ref(getDatabase());
+    // get(child(dbRef, 'users/transactions')).then((snapshot) => {
+    //   if (snapshot.exists()) {
+    //     const data = snapshot.val();
+    //     const test = Object.entries(data).map(([key, value]) => { return value });
+
+    //     const totalIncome = test?.filter(val => {
+    //       if (val.type == "Income") {
+    //         return {
+    //           dt: val.dt
+    //         }
+    //       }
+    //     })
+
+    //     const totalExpense = test?.filter(val => {
+    //       if (val.type == "Expense" && format(val.dt, "MMMM") == monthName) {
+    //         return {
+    //           dt: val.dt
+    //         }
+    //       }
+    //     })
+    //     console.log(totalExpense)
+    //   }
+    // })
+
+    // const totalSumListRef = ref(db, 'users/totalSum');
+    // const newTotalSumListRef = push(totalSumListRef);
+    // set(newTotalSumListRef, {
+    //   month: monthName,
+    //   year: year,
+    // })
 
     alert("Product/ transaction registered");
 
