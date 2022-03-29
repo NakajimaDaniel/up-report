@@ -30,17 +30,16 @@ export default function Overview() {
         setListOfTransactions(result);
       }
     })
-  }, [])
+  }, []);
 
 
   return (
     <Container w="100%" maxW="100vw" >
       <Header />
-      <Menu />
 
       <VStack mr="100px" ml="100px" pb={10} alignItems="center">
         <MonthlyBalanceGraph transactions={listOfTransactions} />
-        <AllExpensesPerMonthTable />
+        <AllExpensesPerMonthTable transactions={listOfTransactions} />
       </VStack>
 
     </Container>
