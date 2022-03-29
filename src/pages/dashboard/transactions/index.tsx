@@ -16,8 +16,6 @@ export default function Transactions() {
     <Container w="100%" maxW="100vw" >
       <Header />
 
-      <Menu />
-
       <HStack justifyContent="center" pb={7}>
         <Box pr={3} _hover={{ cursor: 'pointer' }} onClick={() => setSelectRegisterOption("newTransaction")} >
           <Text color={selectRegisterOption == "newTransaction" ? "" : "#C1C1C1"}>Register New Transaction</Text>
