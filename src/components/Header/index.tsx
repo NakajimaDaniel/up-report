@@ -19,10 +19,8 @@ export function Header() {
     const auth = getAuth();
 
     signOut(auth).then(() => {
-      // Sign-out successful.
       router.push("/")
     }).catch((error) => {
-      // An error happened.
     });
   }
 
@@ -73,7 +71,7 @@ export function Header() {
           <Popover>
             <PopoverTrigger>
               <Skeleton isLoaded={!!user} startColor='pink.500' endColor='orange.500' _hover={{ cursor: "pointer" }} ml={5} >
-                <Image src={user?.photoURL} width="40px" height="40px" mr={3} />
+                <Image src={user?.photoURL} width="40px" height="40px" mr={3} borderRadius='full' />
               </Skeleton>
             </PopoverTrigger>
             <PopoverContent>
