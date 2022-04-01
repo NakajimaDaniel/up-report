@@ -1,4 +1,5 @@
 import { Box, Container, Divider, Flex, Skeleton, Spacer, Text } from "@chakra-ui/react";
+import { format } from "date-fns";
 
 
 interface Transaction {
@@ -15,33 +16,22 @@ interface MonthBalanceCardProps {
 
 export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardProps) {
 
-  const actualMonth = convertUnixToMonthName(Date.parse(new Date));
+  const actualMonth = format(new Date(), "MMMM");
   const actualYear = new Date().getFullYear();
 
-  function convertUnixToMonthName(unixtimestamp: number) {
-
-    const unixTimestampConverted = new Date(unixtimestamp);
-
-    const monthNumber = unixTimestampConverted.getMonth();
-
-    switch (monthNumber) {
-      case 0: return "January";
-      case 1: return "February";
-      case 2: return "March";
-      case 3: return "April";
-      case 4: return "May";
-      case 5: return "June";
-      case 6: return "July";
-      case 7: return "August";
-      case 8: return "September";
-      case 9: return "October";
-      case 10: return "November";
-      case 11: return "Dezember";
+  const newTransactionList = transactions?.map(val => {
+    return {
+      dt: val.dt,
+      description: val.description,
+      category: val.category,
+      type: val.type,
+      value: val.value,
+      month: format(val.dt, "MMMM")
     }
-  }
+  })
 
-  const allExpenseTransactions = transactions?.filter(val => {
-    if (val.type == "Expense") return val.category
+  const allExpenseTransactions = newTransactionList?.filter(val => {
+    if (val.type == "Expense" && val.month === actualMonth) return val.category
   })
 
   const arrayOfCategories = allExpenseTransactions?.map(val => { return val.category });
