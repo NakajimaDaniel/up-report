@@ -1,4 +1,4 @@
-import { Container, Flex, Spacer, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Container, Flex, Spacer, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import { format } from "date-fns";
 
 
@@ -36,33 +36,33 @@ export function LatestExpensesCard({ transactions }: LatestExpensesCardProps) {
   return (
     <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
       <Text fontWeight="semibold" fontSize={19} pb={4}>Latest Expenses</Text>
+      <Box overflowX="auto" >
+        <Table mb={4}>
+          <Thead>
+            <Tr>
+              <Th>Date</Th>
+              <Th>Item</Th>
+              <Th>Category</Th>
+              <Th>Value</Th>
+            </Tr>
+          </Thead>
 
-      <Table mb={4}>
-        <Thead>
-          <Tr>
-            <Th>Date</Th>
-            <Th>Item</Th>
-            <Th>Category</Th>
-            <Th>Value</Th>
-          </Tr>
-        </Thead>
-
-        <Tbody>
-          {transactions ? (
-            newTransactionsList.map(val => {
-              return (
-                <Tr key={val.dt}>
-                  <Td>{format(val.dt, "dd/MM/yyyy")}</Td>
-                  <Td>{val.description}</Td>
-                  <Td>{val.category}</Td>
-                  <Td color="#EB4335">R$ -{val.value}</Td>
-                </Tr>
-              )
-            })
-          ) : (<Tr></Tr>)}
-        </Tbody>
-      </Table>
-
+          <Tbody>
+            {transactions ? (
+              newTransactionsList.map(val => {
+                return (
+                  <Tr key={val.dt}>
+                    <Td>{format(val.dt, "dd/MM/yyyy")}</Td>
+                    <Td>{val.description}</Td>
+                    <Td>{val.category}</Td>
+                    <Td color="#EB4335">R$ -{val.value}</Td>
+                  </Tr>
+                )
+              })
+            ) : (<Tr></Tr>)}
+          </Tbody>
+        </Table>
+      </Box>
 
       <Text fontWeight="light" position="relative" bottom="0" right="0" fontSize={13}>Last update 21 Fev 2022 10:10:15</Text>
 
