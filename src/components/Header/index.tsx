@@ -34,12 +34,20 @@ export function Header() {
           <Text color="white" fontWeight="bold" fontSize="30px" textAlign="center">UpReport</Text>
           <Spacer />
 
-          <Skeleton isLoaded={!!user} startColor='pink.500' endColor='orange.500'>
-            <Image src="https://avatars.githubusercontent.com/u/59265044?v=4" width="40px" height="40px" mr={3} />
-          </Skeleton>
-          <Skeleton isLoaded={!!user} height='20px' startColor='pink.500' endColor='orange.500'>
-            <Box w="150px" >{user?.displayName}</Box>
-          </Skeleton>
+          <Popover>
+            <PopoverTrigger>
+              <Skeleton isLoaded={!!user} startColor='pink.500' endColor='orange.500' _hover={{ cursor: "pointer" }} ml={5} >
+                <Image src={user?.photoURL} width="40px" height="40px" mr={3} borderRadius='full' />
+              </Skeleton>
+            </PopoverTrigger>
+            <PopoverContent>
+              <PopoverArrow />
+              <PopoverHeader>Signed in as {user?.displayName}</PopoverHeader>
+              <PopoverBody>
+                <Button onClick={() => handleLogout()} >Sign out</Button>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
         </Flex>
       ) : (
         <Flex align="center" pl={5}>
