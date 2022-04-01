@@ -3,6 +3,7 @@ import { Formik, Form, Field } from "formik";
 import { useContext, useState } from "react";
 import { ArrowDown, ArrowUp } from "react-feather";
 import { AuthContext } from "../../contexts/AuthContext";
+import { useDimensions } from "../../hooks/useDimensions";
 import { database, ref, set, push, onValue, get, child, getDatabase } from "../../services/firebase";
 
 interface Category {
@@ -17,6 +18,7 @@ export function RegisterNewCategoryForm() {
   const [newCategory, setNewCategory] = useState({} as Category);
   const [isCategoryAlreadyExist, setIsCategoryAlreadyExist] = useState(false);
 
+  const { width } = useDimensions();
 
   async function handleSubmit(values, actions) {
     const db = database;
@@ -34,7 +36,7 @@ export function RegisterNewCategoryForm() {
 
 
     const dbRef = ref(getDatabase());
-    get(child(dbRef, `users/categories`)).then((snapshot) => {
+    get(child(dbRef, `users/${user.uid}/categories`)).then((snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const test = Object.entries(data).map(([key, value]) => { return value });
@@ -48,7 +50,7 @@ export function RegisterNewCategoryForm() {
         } else {
           const category = values.category;
 
-          const categoryListRef = ref(db, `users/categories`);
+          const categoryListRef = ref(db, `users/${user.uid}/categories`);
           const newCategoryListRef = push(categoryListRef);
           set(newCategoryListRef, {
             category,
@@ -68,7 +70,7 @@ export function RegisterNewCategoryForm() {
 
         const category = values.category;
 
-        const categoryListRef = ref(db, `users/categories`);
+        const categoryListRef = ref(db, `users/${user.uid}/categories`);
         const newCategoryListRef = push(categoryListRef);
         set(newCategoryListRef, {
           category,
@@ -99,14 +101,14 @@ export function RegisterNewCategoryForm() {
   }
 
   return (
-    <VStack mr="200px" ml="200px" pb={10} alignItems="center">
+    <VStack mr={width && width > 1180 ? ["200px"] : [0]} ml={width && width > 1180 ? ["200px"] : [0]} pb={10} alignItems="center">
 
       <Formik
         initialValues={{ category: '' }}
         onSubmit={(values, actions) => { handleSubmit(values, actions) }}
 
       >
-        <Box w="50%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
+        <Box w={width && width > 1180 ? "50%" : "100%"} bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
           <Form>
 
             <Field name="category" validate={ValidateCategoryNameInput}>
