@@ -1,7 +1,9 @@
 import { Box, Text, Center, Image } from '@chakra-ui/react';
+import { roundToNearestMinutes } from 'date-fns/esm';
 import { useRouter } from 'next/router';
 import { useContext, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
+import { getAuth, onAuthStateChanged } from '../services/firebase';
 
 
 
@@ -12,12 +14,19 @@ export default function Home() {
   const router = useRouter();
 
   function handleLoginWithGoogleButton() {
-    if (!user) {
-      signInWithGoogle()
-    } else {
-      router.push('/dashboard')
-    }
+    signInWithGoogle();
   }
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/dashboard")
+      }
+      unsubscribe();
+    })
+  }, [user])
+
 
   return (
     <Center h="100vh" maxW="100vw" w="100%" bg="#46BCFF">
