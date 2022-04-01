@@ -16,8 +16,8 @@ interface MonthBalanceCardProps {
 
 export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardProps) {
 
-  const actualMonth = format(new Date(), "MMMM");
-  const actualYear = new Date().getFullYear();
+  const currentMonth = format(new Date(), "MMMM");
+  const currentYear = new Date().getFullYear();
 
   const newTransactionList = transactions?.map(val => {
     return {
@@ -31,7 +31,7 @@ export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardPro
   })
 
   const allExpenseTransactions = newTransactionList?.filter(val => {
-    if (val.type == "Expense" && val.month === actualMonth) return val.category
+    if (val.type == "Expense" && val.month === currentMonth) return val.category
   })
 
   const arrayOfCategories = allExpenseTransactions?.map(val => { return val.category });
@@ -69,7 +69,7 @@ export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardPro
 
   return (
     <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6} >
-      <Text fontWeight="semibold" fontSize={19} pb={4}>Total Expense by Category ({actualMonth}.{actualYear})</Text>
+      <Text fontWeight="semibold" fontSize={19} pb={4}>Total Expense by Category ({currentMonth}.{currentYear})</Text>
 
       <Skeleton isLoaded={!!transactions}>
         {transactions ? (
