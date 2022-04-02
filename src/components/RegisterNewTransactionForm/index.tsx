@@ -4,6 +4,7 @@ import { Formik, Form, Field } from "formik";
 import { useContext, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp } from "react-feather";
 import { AuthContext } from "../../contexts/AuthContext";
+import { useDimensions } from "../../hooks/useDimensions";
 import { database, ref, set, push, getDatabase, get, child } from "../../services/firebase";
 
 interface Transaction {
@@ -22,6 +23,8 @@ export function RegisterNewTransactionForm() {
   const [transactionType, setTransactionType] = useState<"Expense" | "Income">();
   const [categoryNames, setCategoryNames] = useState();
   const [isLoading, setIsLoading] = useState(false);
+
+  const { width } = useDimensions();
 
 
   function getMonthName(monthNumber: number) {
@@ -93,7 +96,7 @@ export function RegisterNewTransactionForm() {
     const monthName = format(new Date(), "MMMM");
     const year = new Date().getFullYear();
 
-    const transactionListRef = ref(db, `users/transactions/`);
+    const transactionListRef = ref(db, `users/${user.uid}/transactions/`);
     const newTransactionRef = push(transactionListRef);
     set(newTransactionRef, {
       dt: Date.parse(new Date),
@@ -151,7 +154,7 @@ export function RegisterNewTransactionForm() {
   useEffect(() => {
 
     const dbRef = ref(getDatabase());
-    get(child(dbRef, `users/categories`)).then((snapshot) => {
+    get(child(dbRef, `users/${user.uid}/categories`)).then((snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const test = Object.entries(data).map(([key, value]) => { return value });
@@ -169,7 +172,7 @@ export function RegisterNewTransactionForm() {
   }, [])
 
   return (
-    <VStack mr="200px" ml="200px" pb={10} alignItems="center">
+    <VStack mr={width && width > 1180 ? ["200px"] : [0]} ml={width && width > 1180 ? ["200px"] : [0]} pb={10} alignItems="center">
 
       <Formik
         initialValues={{ description: '', category: '', value: '' }}
@@ -177,7 +180,7 @@ export function RegisterNewTransactionForm() {
         onSubmit={(values, actions) => { handleSubmit(values, actions) }}
 
       >
-        <Box w="50%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
+        <Box w={width && width > 1180 ? "50%" : "100%"} bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
           <Form>
             <Field name="description" validate={ValidateDescriptionFieldForm}>
               {({ field, form }) => (
