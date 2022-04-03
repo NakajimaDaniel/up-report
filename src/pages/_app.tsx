@@ -1,6 +1,7 @@
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { mode } from '@chakra-ui/theme-tools';
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import { AuthContextProvider } from '../contexts/AuthContext';
 
 const theme = extendTheme({
@@ -23,8 +24,12 @@ const theme = extendTheme({
 
 
 function MyApp({ Component, pageProps }: AppProps) {
+
   return (
     <ChakraProvider theme={theme}>
+      <Head>
+        <title>UpReport</title>
+      </Head>
       <AuthContextProvider>
         <Component {...pageProps} />
       </AuthContextProvider>
