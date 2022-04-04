@@ -88,15 +88,15 @@ export function RegisterNewTransactionForm() {
       throw new Error('you must be logged in')
     }
 
-    await set(ref(db, 'users/' + user.uid), {
-      userName: user.displayName,
-      userEmail: user.email,
-    });
+    // await set(ref(db, 'users/' + user.uid), {
+    //   userName: user.displayName,
+    //   userEmail: user.email,
+    // });
 
     const monthName = format(new Date(), "MMMM");
     const year = new Date().getFullYear();
 
-    const transactionListRef = ref(db, `users/${user.uid}/transactions/`);
+    const transactionListRef = ref(db, `users/${user.uid}/transactions`);
     const newTransactionRef = push(transactionListRef);
     set(newTransactionRef, {
       dt: Date.parse(new Date),
