@@ -5,6 +5,7 @@ import { Header } from "../../../components/Header";
 import { Menu } from "../../../components/Menu";
 import { MonthlyBalanceGraph } from "../../../components/MonthlyBalanceGraph";
 import { AuthContext } from "../../../contexts/AuthContext";
+import { useDimensions } from "../../../hooks/useDimensions";
 import { get, ref, getDatabase, child } from '../../../services/firebase';
 
 
@@ -22,6 +23,7 @@ export default function Overview() {
 
   const [listOfTransactions, setListOfTransactions] = useState<Transaction[]>();
   const { user } = useContext(AuthContext);
+  const { width } = useDimensions();
 
   useEffect(() => {
     const dbRef = ref(getDatabase());
@@ -39,7 +41,7 @@ export default function Overview() {
     <Container w="100%" maxW="100vw" >
       <Header />
 
-      <VStack mr="100px" ml="100px" pb={10} alignItems="center">
+      <VStack mr={width && width > 1180 ? ["100px"] : [0]} ml={width && width > 1180 ? ["100px"] : [0]} pb={10} alignItems="center">
         <MonthlyBalanceGraph transactions={listOfTransactions} />
         <AllExpensesPerMonthTable transactions={listOfTransactions} />
       </VStack>
