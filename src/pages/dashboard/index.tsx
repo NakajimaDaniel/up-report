@@ -30,13 +30,6 @@ export default function Dashboard() {
 
     if (user) {
       const dbRef = ref(getDatabase());
-      get(child(dbRef, `users`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const result = Object.entries(data).map(([key, value]) => { return key });
-        }
-      })
-
 
       get(child(dbRef, `users/${user.uid}/transactions`)).then((snapshot) => {
         if (snapshot.exists()) {
@@ -49,29 +42,29 @@ export default function Dashboard() {
       router.push('/')
     }
 
-
   }, [])
 
-
-  return (
-    <Container w="100%" maxW="100vw" >
-      <Header />
-      {width && width > 660 ? (
-        <HStack mr={width && width > 1180 ? ["200px", "200px", "250px", "300px"] : [0]} ml={width && width > 1180 ? ["200px", "200px", "250px", "300px"] : [0]} pb={10} alignItems="center">
-          <MonthBalanceCard user={user} transactions={listOfTransactions} />
-          <TotalExpenseByCategoryCard transactions={listOfTransactions} />
-        </HStack>
-      ) : (
-        <VStack mb={5}>
-          <MonthBalanceCard user={user} transactions={listOfTransactions} />
-          <TotalExpenseByCategoryCard transactions={listOfTransactions} />
+  if (user) {
+    return (
+      <Container w="100%" maxW="100vw" >
+        <Header />
+        {width && width > 660 ? (
+          <HStack mr={width && width > 1180 ? ["200px", "200px", "250px", "300px"] : [0]} ml={width && width > 1180 ? ["200px", "200px", "250px", "300px"] : [0]} pb={10} alignItems="center">
+            <MonthBalanceCard user={user} transactions={listOfTransactions} />
+            <TotalExpenseByCategoryCard transactions={listOfTransactions} />
+          </HStack>
+        ) : (
+          <VStack mb={5}>
+            <MonthBalanceCard user={user} transactions={listOfTransactions} />
+            <TotalExpenseByCategoryCard transactions={listOfTransactions} />
+          </VStack>
+        )}
+        <VStack mr={width && width > 1180 ? ["200px", "200px", "250px", "300px"] : [0]} ml={width && width > 1180 ? ["200px", "200px", "250px", "300px"] : [0]} pb={10} alignItems="center">
+          <LatestExpensesCard transactions={listOfTransactions} />
         </VStack>
-      )}
-      <VStack mr={width && width > 1180 ? ["200px", "200px", "250px", "300px"] : [0]} ml={width && width > 1180 ? ["200px", "200px", "250px", "300px"] : [0]} pb={10} alignItems="center">
-        <LatestExpensesCard transactions={listOfTransactions} />
-      </VStack>
-
-
-    </Container>
-  )
+      </Container>
+    )
+  } else {
+    return (<Container></Container>)
+  }
 }
