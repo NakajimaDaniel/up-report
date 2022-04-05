@@ -10,16 +10,20 @@ interface Transaction {
   value: string,
 }
 
+interface newTransaction extends Transaction {
+  monthYear: string,
+}
+
 interface AllExpensesPerMonthTableProps {
   transactions: Transaction[];
 }
 
 export function AllExpensesPerMonthTable({ transactions }: AllExpensesPerMonthTableProps) {
 
-  const [selectedMonthYear, setSelectedMonthYear] = useState();
-  const [selectedMonthYearTransactions, setSelectedMonthYearTransaction] = useState();
-  const [totalExpenseValue, setTotalExpenseValue] = useState();
-  const [totalIncomeValue, setTotalIncomeValue] = useState();
+  const [selectedMonthYear, setSelectedMonthYear] = useState<string>();
+  const [selectedMonthYearTransactions, setSelectedMonthYearTransaction] = useState<newTransaction[]>();
+  const [totalExpenseValue, setTotalExpenseValue] = useState<number>();
+  const [totalIncomeValue, setTotalIncomeValue] = useState<number>();
 
   const newTransactionList = transactions?.map(val => {
     return {
@@ -38,8 +42,8 @@ export function AllExpensesPerMonthTable({ transactions }: AllExpensesPerMonthTa
     return listOfMonthYear.indexOf(item) == position
   })
 
-  function selectMonthTransactions(selectedMonthYear, transactions) {
-    const transactionList = transactions?.filter(val => {
+  function selectMonthTransactions(selectedMonthYear: string, transactions: newTransaction[]) {
+    const transactionList = transactions.filter(val => {
       if (val.monthYear == selectedMonthYear) {
         return val
       }
@@ -49,8 +53,13 @@ export function AllExpensesPerMonthTable({ transactions }: AllExpensesPerMonthTa
   }
 
   useEffect(() => {
-    const newTransactionArray = selectMonthTransactions(selectedMonthYear, newTransactionList);
-    setSelectedMonthYearTransaction(newTransactionArray);
+    if (selectedMonthYear) {
+      const newTransactionArray = selectMonthTransactions(selectedMonthYear, newTransactionList);
+      setSelectedMonthYearTransaction(newTransactionArray);
+
+    }
+
+
 
   }, [selectedMonthYear]);
 
@@ -88,7 +97,7 @@ export function AllExpensesPerMonthTable({ transactions }: AllExpensesPerMonthTa
     <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
       <Text fontWeight="semibold" fontSize={19} pb={4}>All Expenses per Month </Text>
 
-      <Select placeholder='Select option' mb={5} onClick={(e) => setSelectedMonthYear(e.target.value)} >
+      <Select placeholder='Select option' mb={5} onClick={(e) => setSelectedMonthYear((e.target as HTMLButtonElement).value)} >
         {listOfMonthYearFiltered?.map(val => {
           return (
             <option key={val} value={val}>{val}</option>
@@ -126,7 +135,10 @@ export function AllExpensesPerMonthTable({ transactions }: AllExpensesPerMonthTa
               <Td></Td>
               <Td></Td>
               <Td></Td>
-              <Td color={totalExpenseValue > totalIncomeValue ? "#EB4335" : "#5FF099"}>R$ {totalIncomeValue - totalExpenseValue}</Td>
+              <Td
+                color={totalExpenseValue || totalIncomeValue && totalExpenseValue > totalIncomeValue ? "#EB4335" : "#5FF099"}>
+                R$ {totalExpenseValue || totalIncomeValue && totalIncomeValue - totalExpenseValue}
+              </Td>
             </Tr>
           </Tfoot>
         </Table>
