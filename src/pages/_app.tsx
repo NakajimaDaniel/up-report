@@ -29,6 +29,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ChakraProvider theme={theme}>
       <Head>
         <title>UpReport</title>
+        <link rel="shortcut icon" href="/images/favicon.ico" />
       </Head>
       <AuthContextProvider>
         <Component {...pageProps} />
