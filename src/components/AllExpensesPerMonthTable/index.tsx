@@ -22,8 +22,8 @@ export function AllExpensesPerMonthTable({ transactions }: AllExpensesPerMonthTa
 
   const [selectedMonthYear, setSelectedMonthYear] = useState<string>();
   const [selectedMonthYearTransactions, setSelectedMonthYearTransaction] = useState<newTransaction[]>();
-  const [totalExpenseValue, setTotalExpenseValue] = useState<number>();
-  const [totalIncomeValue, setTotalIncomeValue] = useState<number>();
+  const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
+  const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
 
   const newTransactionList = transactions?.map(val => {
     return {
@@ -56,42 +56,42 @@ export function AllExpensesPerMonthTable({ transactions }: AllExpensesPerMonthTa
     if (selectedMonthYear) {
       const newTransactionArray = selectMonthTransactions(selectedMonthYear, newTransactionList);
       setSelectedMonthYearTransaction(newTransactionArray);
-
     }
-
-
 
   }, [selectedMonthYear]);
 
   useEffect(() => {
-    const allExpenses = selectedMonthYearTransactions?.filter(val => { return val.type == "Expense" });
-    const allIncomes = selectedMonthYearTransactions?.filter(val => { return val.type == "Income" });
 
-    const allExpensesFormatted = allExpenses?.map(val => {
-      return {
-        value: Number(val.value)
-      }
-    })
+    if (selectedMonthYearTransactions) {
+      const allExpenses = selectedMonthYearTransactions.filter(val => { return val.type == "Expense" });
+      const allIncomes = selectedMonthYearTransactions.filter(val => { return val.type == "Income" });
 
-    const allIncomesFormatted = allIncomes?.map(val => {
-      return {
-        value: Number(val.value)
-      }
-    })
+      const allExpensesFormatted = allExpenses.map(val => {
+        return {
+          value: Number(val.value)
+        }
+      })
 
-    const totalExpensesSum = allExpensesFormatted?.reduce((total, transaction) => {
-      return total = total + transaction.value
-    }, 0)
+      const allIncomesFormatted = allIncomes.map(val => {
+        return {
+          value: Number(val.value)
+        }
+      })
 
-    const totalIncomesSum = allIncomesFormatted?.reduce((total, transaction) => {
-      return total = total + transaction.value
-    }, 0)
+      const totalExpensesSum = allExpensesFormatted.reduce((total, transaction) => {
+        return total = total + transaction.value
+      }, 0)
 
+      const totalIncomesSum = allIncomesFormatted.reduce((total, transaction) => {
+        return total = total + transaction.value
+      }, 0)
 
-    setTotalIncomeValue(totalIncomesSum);
-    setTotalExpenseValue(totalExpensesSum);
+      setTotalIncomeValue(totalIncomesSum);
+      setTotalExpenseValue(totalExpensesSum);
+    }
 
-  }, [selectedMonthYearTransactions])
+  }, [selectedMonthYearTransactions]);
+
 
   return (
     <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
@@ -136,8 +136,8 @@ export function AllExpensesPerMonthTable({ transactions }: AllExpensesPerMonthTa
               <Td></Td>
               <Td></Td>
               <Td
-                color={totalExpenseValue || totalIncomeValue && totalExpenseValue > totalIncomeValue ? "#EB4335" : "#5FF099"}>
-                R$ {totalExpenseValue || totalIncomeValue && totalIncomeValue - totalExpenseValue}
+                color={totalExpenseValue > totalIncomeValue ? "#EB4335" : "#5FF099"}>
+                R$ {totalIncomeValue - totalExpenseValue}
               </Td>
             </Tr>
           </Tfoot>
