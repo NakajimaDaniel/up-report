@@ -1,26 +1,22 @@
-import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, HStack, Icon, Input, Select, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, FormLabel, Input, VStack } from "@chakra-ui/react";
 import { Formik, Form, Field } from "formik";
 import { useContext, useState } from "react";
-import { ArrowDown, ArrowUp } from "react-feather";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useDimensions } from "../../hooks/useDimensions";
-import { database, ref, set, push, onValue, get, child, getDatabase } from "../../services/firebase";
+import { database, ref, set, push, get, child, getDatabase } from "../../services/firebase";
 
-interface Category {
-  category: string;
-}
+
+
 
 export function RegisterNewCategoryForm() {
 
   const { user } = useContext(AuthContext);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [newCategory, setNewCategory] = useState({} as Category);
-  const [isCategoryAlreadyExist, setIsCategoryAlreadyExist] = useState(false);
 
   const { width } = useDimensions();
 
-  async function handleSubmit(values, actions) {
+  async function handleSubmit(values: any, actions: any) {
     const db = database;
 
     setIsLoading(true);
@@ -39,9 +35,9 @@ export function RegisterNewCategoryForm() {
     get(child(dbRef, `users/${user.uid}/categories`)).then((snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const test = Object.entries(data).map(([key, value]) => { return value });
+        const test = Object.entries(data).map(([value]) => { return value });
 
-        const names = test.map(el => el.category)
+        const names = test.map((el: any) => el.category)
 
         const isExists = (names.includes(values.category));
 
@@ -112,7 +108,7 @@ export function RegisterNewCategoryForm() {
           <Form>
 
             <Field name="category" validate={ValidateCategoryNameInput}>
-              {({ field, form }) => (
+              {({ field, form }: any) => (
                 <FormControl isInvalid={form.errors.category && form.touched.category} mb={5}>
                   <FormLabel>Register new category</FormLabel>
                   <Input placeholder="Enter category name ..." id="description" {...field} />
