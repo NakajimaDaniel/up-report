@@ -1,5 +1,5 @@
-import { Box, Container, Divider, Flex, Skeleton, Spacer, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Container, Divider, Flex, Skeleton, Spacer, Text } from "@chakra-ui/react";
+import { format } from "date-fns";
 
 interface User {
   uid: string,
@@ -24,39 +24,9 @@ interface MonthBalanceCardProps {
 
 export function MonthBalanceCard({ user, transactions }: MonthBalanceCardProps) {
 
-  const actualMonth = convertUnixToMonthName(Date.parse(new Date));
-  const actualYear = new Date().getFullYear();
+  const currentMonth = format(new Date(), "MMMM");
+  const currentYear = format(new Date(), "yyyy");
 
-  const actualDateAndTime = new Date().toUTCString();
-
-
-  function convertUnixToMonthName(unixtimestamp: number) {
-
-    const unixTimestampConverted = new Date(unixtimestamp);
-
-    const monthNumber = unixTimestampConverted.getMonth();
-
-    switch (monthNumber) {
-      case 0: return "January";
-      case 1: return "February";
-      case 2: return "March";
-      case 3: return "April";
-      case 4: return "May";
-      case 5: return "June";
-      case 6: return "July";
-      case 7: return "August";
-      case 8: return "September";
-      case 9: return "October";
-      case 10: return "November";
-      case 11: return "Dezember";
-    }
-  }
-
-  function convertUnixToYear(unixtimestamp: number) {
-    const unixTimestampConverted = new Date(unixtimestamp);
-
-    return unixTimestampConverted.getFullYear();
-  }
 
   const transactionsFormatted = transactions?.map(val => (
     {
@@ -65,14 +35,14 @@ export function MonthBalanceCard({ user, transactions }: MonthBalanceCardProps) 
       category: val.category,
       type: val.type,
       value: Number(val.value),
-      monthRegistered: convertUnixToMonthName(val.dt),
-      yearRegistered: convertUnixToYear(val.dt),
+      monthRegistered: format(val.dt, "MMMM"),
+      yearRegistered: format(val.dt, "yyyy"),
     }
   ))
 
   const totalExpenseReduced = transactionsFormatted?.reduce((total, transaction) => {
 
-    if (transaction.type == "Expense" && transaction.yearRegistered == actualYear && transaction.monthRegistered == actualMonth) {
+    if (transaction.type == "Expense" && transaction.yearRegistered == currentYear && transaction.monthRegistered == currentMonth) {
       total += transaction.value;
     }
     return total;
@@ -80,7 +50,7 @@ export function MonthBalanceCard({ user, transactions }: MonthBalanceCardProps) 
 
   const totalIncomeReduced = transactionsFormatted?.reduce((total, transaction) => {
 
-    if (transaction.type == "Income" && transaction.yearRegistered == actualYear && transaction.monthRegistered == actualMonth) {
+    if (transaction.type == "Income" && transaction.yearRegistered == currentYear && transaction.monthRegistered == currentMonth) {
       total += transaction.value;
     }
     return total;
@@ -89,7 +59,7 @@ export function MonthBalanceCard({ user, transactions }: MonthBalanceCardProps) 
 
   return (
     <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6} >
-      <Text fontWeight="semibold" fontSize={20} pb={4}>Month Balance ({actualMonth}.{actualYear})</Text>
+      <Text fontWeight="semibold" fontSize={20} pb={4}>Month Balance ({currentMonth}.{currentYear})</Text>
 
       <Flex align="center" >
         <Text fontWeight="medium" fontSize={30} color="#5FF099" >R$</Text>
