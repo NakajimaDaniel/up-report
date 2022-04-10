@@ -21,28 +21,10 @@ export function RegisterNewTransactionForm() {
   const { user } = useContext(AuthContext);
   const [newTransaction, setNewTransaction] = useState({} as Transaction);
   const [transactionType, setTransactionType] = useState<"Expense" | "Income">();
-  const [categoryNames, setCategoryNames] = useState();
+  const [categoryNames, setCategoryNames] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { width } = useDimensions();
-
-
-  function getMonthName(monthNumber: number) {
-    switch (monthNumber) {
-      case 0: return "January";
-      case 1: return "February";
-      case 2: return "March";
-      case 3: return "April";
-      case 4: return "May";
-      case 5: return "June";
-      case 6: return "July";
-      case 7: return "August";
-      case 8: return "September";
-      case 9: return "October";
-      case 10: return "November";
-      case 11: return "Dezember";
-    }
-  }
 
 
   function ValidateDescriptionFieldForm(value: string) {
@@ -69,7 +51,7 @@ export function RegisterNewTransactionForm() {
   }
 
 
-  function ValidateValueFieldForm(value) {
+  function ValidateValueFieldForm(value: number) {
     let error
     if (!value) {
       error = "Value is required"
@@ -79,7 +61,8 @@ export function RegisterNewTransactionForm() {
     return error
   }
 
-  async function handleSubmit(values, actions) {
+
+  async function handleSubmit(values: any, actions: any) {
     const db = database;
 
     setIsLoading(true);
@@ -88,55 +71,16 @@ export function RegisterNewTransactionForm() {
       throw new Error('you must be logged in')
     }
 
-    // await set(ref(db, 'users/' + user.uid), {
-    //   userName: user.displayName,
-    //   userEmail: user.email,
-    // });
-
-    const monthName = format(new Date(), "MMMM");
-    const year = new Date().getFullYear();
-
     const transactionListRef = ref(db, `users/${user.uid}/transactions`);
     const newTransactionRef = push(transactionListRef);
+
     set(newTransactionRef, {
-      dt: Date.parse(new Date),
+      dt: Number(format(new Date(), "T")),
       description: values.description,
       category: values.category,
       type: transactionType,
       value: values.value,
     })
-
-    // const dbRef = ref(getDatabase());
-    // get(child(dbRef, 'users/transactions')).then((snapshot) => {
-    //   if (snapshot.exists()) {
-    //     const data = snapshot.val();
-    //     const test = Object.entries(data).map(([key, value]) => { return value });
-
-    //     const totalIncome = test?.filter(val => {
-    //       if (val.type == "Income") {
-    //         return {
-    //           dt: val.dt
-    //         }
-    //       }
-    //     })
-
-    //     const totalExpense = test?.filter(val => {
-    //       if (val.type == "Expense" && format(val.dt, "MMMM") == monthName) {
-    //         return {
-    //           dt: val.dt
-    //         }
-    //       }
-    //     })
-    //     console.log(totalExpense)
-    //   }
-    // })
-
-    // const totalSumListRef = ref(db, 'users/totalSum');
-    // const newTotalSumListRef = push(totalSumListRef);
-    // set(newTotalSumListRef, {
-    //   month: monthName,
-    //   year: year,
-    // })
 
     alert("Product/ transaction registered");
 
@@ -153,13 +97,17 @@ export function RegisterNewTransactionForm() {
 
   useEffect(() => {
 
+    if (!user) {
+      throw new Error('you must be logged in')
+    }
+
     const dbRef = ref(getDatabase());
     get(child(dbRef, `users/${user.uid}/categories`)).then((snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const test = Object.entries(data).map(([key, value]) => { return value });
 
-        const names = test.map(el => el);
+        const names = test.map((el: any) => el);
         setCategoryNames(names);
 
       }
@@ -183,7 +131,7 @@ export function RegisterNewTransactionForm() {
         <Box w={width && width > 1180 ? "50%" : "100%"} bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
           <Form>
             <Field name="description" validate={ValidateDescriptionFieldForm}>
-              {({ field, form }) => (
+              {({ field, form }: any) => (
                 <FormControl isInvalid={form.errors.description && form.touched.description}>
                   <FormLabel>Product/Description</FormLabel>
                   <Input placeholder="Enter product name or description" id="description" {...field} />
@@ -193,12 +141,12 @@ export function RegisterNewTransactionForm() {
             </Field>
 
             <Field name="category" validate={ValidateCategoryFieldForm}>
-              {({ field, form }) => (
+              {({ field, form }: any) => (
                 <FormControl isInvalid={form.errors.category && form.touched.category}>
                   <FormLabel>Category</FormLabel>
                   <Select placeholder='Select category' id="category" {...field}>
                     {categoryNames ?
-                      categoryNames.map(val => (
+                      categoryNames.map((val: any) => (
                         <option key={val.category}>{val.category}</option>
                       ))
                       :
@@ -212,7 +160,7 @@ export function RegisterNewTransactionForm() {
             </Field>
 
             <Field name="transactionType" validate={ValidateTransactionTypeFieldForm}>
-              {({ form }) => (
+              {({ form }: any) => (
                 <FormControl isInvalid={form.errors.transactionType && form.touched.transactionType}>
                   <Flex pt={5} pb={5} w="100%" alignItems="center" justify="space-between">
                     <Flex
@@ -255,7 +203,7 @@ export function RegisterNewTransactionForm() {
             </Field>
 
             <Field name="value" validate={ValidateValueFieldForm} >
-              {({ field, form }) => (
+              {({ field, form }: any) => (
                 <FormControl isInvalid={form.errors.value && form.touched.value} mb={5}>
                   <FormLabel>Value</FormLabel>
                   <Input placeholder="Enter value" id="value"   {...field} />
