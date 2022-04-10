@@ -1,4 +1,5 @@
 import { Box, Container, Text, VStack } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { AllExpensesPerMonthTable } from "../../../components/AllExpensesPerMonthTable";
 import { Header } from "../../../components/Header";
@@ -20,21 +21,23 @@ interface Transaction {
 
 export default function Overview() {
 
-
   const [listOfTransactions, setListOfTransactions] = useState<Transaction[]>();
   const { user } = useContext(AuthContext);
   const { width } = useDimensions();
 
   useEffect(() => {
-    const dbRef = ref(getDatabase());
-    get(child(dbRef, `users/${user?.uid}/transactions`)).then((snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const result = Object.entries(data).map(([key, value]) => { return value });
-        setListOfTransactions(result);
-      }
-    })
-  }, []);
+    if (user) {
+      const dbRef = ref(getDatabase());
+
+      get(child(dbRef, `users/${user.uid}/transactions`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const result = Object.entries(data).map(([key, value]) => { return value });
+          setListOfTransactions(result);
+        }
+      })
+    }
+  }, [user]);
 
 
   return (
