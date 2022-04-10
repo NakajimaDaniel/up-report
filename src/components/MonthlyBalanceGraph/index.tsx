@@ -11,7 +11,18 @@ interface Transaction {
   value: string,
 }
 
+interface NewTransaction extends Transaction {
+  year: string,
+  month: string,
+}
 
+interface NewTransactionList extends Array<NewTransaction> { }
+
+interface ListByMonth {
+  month: string,
+  totalExpense: number | undefined,
+  totalIncome: number | undefined,
+}
 
 interface MonthlyBalanceGraphProps {
   transactions: Transaction[];
@@ -21,10 +32,10 @@ interface MonthlyBalanceGraphProps {
 
 export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) {
 
-  const [selectedYear, setSelectedYear] = useState(2022);
-  const [listByMonth, setListByMonth] = useState();
-  const [monthsArray, setMonthsArray] = useState();
-  const [balanceArrayValue, setBalanceArrayValue] = useState();
+  const [selectedYear, setSelectedYear] = useState("");
+  const [listByMonth, setListByMonth] = useState<ListByMonth[]>([]);
+  const [monthsArray, setMonthsArray] = useState<string[]>([]);
+  const [balanceArrayValue, setBalanceArrayValue] = useState<number[]>([]);
 
 
   const newTransactionList = transactions?.map(val => {
@@ -45,22 +56,23 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
     return arrayOfYears.indexOf(item) == position
   })
 
-  function retrieveAllExpense(year: number) {
+
+  function retrieveAllExpense(year: string) {
     const total = newTransactionList?.filter(val => {
       if (val.type == "Expense") {
         return {
-          dt: val.dt
+          val
         }
       }
     })
     return total
   }
 
-  function retriveAllIncomes(year: number) {
+  function retriveAllIncomes(year: string) {
     const total = newTransactionList?.filter(val => {
       if (val.type == "Income") {
         return {
-          dt: val.dt
+          val
         }
       }
     })
@@ -68,6 +80,8 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
   }
 
   useEffect(() => {
+
+
     const allExpenses = retrieveAllExpense(selectedYear);
     const allIncomes = retriveAllIncomes(selectedYear);
 
@@ -82,8 +96,8 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
       return monthsOfAllIncomes.indexOf(item) == position
     })
 
-    const totalByMonth = (array) => {
-      return array?.reduce((total, item) => {
+    const totalByMonth = (array: NewTransactionList) => {
+      return array?.reduce((total: any, item) => {
         total[item.month] = array.reduce((acc, obj) => {
           if (obj.month == item.month) {
             acc = acc + Number(obj.value)
@@ -121,6 +135,7 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
         setListByMonth(newmap);
       }
     }
+
   }, [])
 
 
@@ -140,8 +155,8 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
       return monthsOfAllIncomes.indexOf(item) == position
     })
 
-    const totalByMonth = (array) => {
-      return array?.reduce((total, item) => {
+    const totalByMonth = (array: NewTransactionList) => {
+      return array?.reduce((total: any, item) => {
         total[item.month] = array.reduce((acc, obj) => {
           if (obj.month == item.month) {
             acc = acc + Number(obj.value)
@@ -199,7 +214,6 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
     })
 
     const balance = listOfIncomeByMonth?.map((valueA, indexInA) => valueA - listOfExpenseByMonth[indexInA]);
-
     setBalanceArrayValue(balance);
 
   }, [listByMonth]);
@@ -232,7 +246,7 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
     tooltip: {
       enabled: true,
       y: {
-        formatter: function (val) {
+        formatter: function (val: any) {
           return "R$ " + val
         }
       },
@@ -296,7 +310,7 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
     <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6}>
       <Text fontWeight="semibold" fontSize={20} pb={4}>Monthly Total Balance</Text>
 
-      <Select onClick={(e) => setSelectedYear(e.target.value)} >
+      <Select onClick={(e) => setSelectedYear((e.target as HTMLButtonElement).value)} >
         {transactions ? (
           arrayOfYearsFiltered?.map(val => {
             return (
