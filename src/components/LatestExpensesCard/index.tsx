@@ -1,5 +1,6 @@
 import { Box, Container, Flex, Spacer, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import { format } from "date-fns";
+import { useEffect, useState } from "react";
 
 
 
@@ -12,25 +13,42 @@ interface Transaction {
 }
 
 interface LatestExpensesCardProps {
-  transactions: Transaction[];
+  transactions: Transaction[] | undefined;
+}
+
+interface NewTransaction {
+  dt: number,
+  description: string,
+  category: string,
+  value: string
 }
 
 
 export function LatestExpensesCard({ transactions }: LatestExpensesCardProps) {
 
-  const allExpenseTransactions = transactions?.filter(val => {
-    if (val.type == "Expense") return val.category
-  })
+  const [newTransactionList, setNewTransactionList] = useState<NewTransaction[]>();
+
+  useEffect(() => {
+
+    if (transactions) {
+      const allExpenseTransactions = transactions.filter(val => {
+        if (val.type == "Expense") return val.category
+      })
 
 
-  const newTransactionsList = allExpenseTransactions?.map(val => {
-    return {
-      dt: val.dt,
-      description: val.description,
-      category: val.category,
-      value: Number(val.value).toFixed(2)
+      const newTransactionsList = allExpenseTransactions.map(val => {
+        return {
+          dt: val.dt,
+          description: val.description,
+          category: val.category,
+          value: Number(val.value).toFixed(2)
+        }
+      });
+
+      setNewTransactionList(newTransactionsList);
     }
-  });
+
+  }, [transactions])
 
 
   return (
@@ -48,8 +66,8 @@ export function LatestExpensesCard({ transactions }: LatestExpensesCardProps) {
           </Thead>
 
           <Tbody>
-            {transactions ? (
-              newTransactionsList.map(val => {
+            {newTransactionList ? (
+              newTransactionList.map(val => {
                 return (
                   <Tr key={val.dt}>
                     <Td>{format(val.dt, "dd/MM/yyyy")}</Td>
