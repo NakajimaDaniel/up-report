@@ -59,7 +59,7 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
 
   function retrieveAllExpense(year: string) {
     const total = newTransactionList?.filter(val => {
-      if (val.type == "Expense") {
+      if (val.type == "Expense" && val.year == year) {
         return {
           val
         }
@@ -70,7 +70,7 @@ export function MonthlyBalanceGraph({ transactions }: MonthlyBalanceGraphProps) 
 
   function retriveAllIncomes(year: string) {
     const total = newTransactionList?.filter(val => {
-      if (val.type == "Income") {
+      if (val.type == "Income" && val.year == year) {
         return {
           val
         }
