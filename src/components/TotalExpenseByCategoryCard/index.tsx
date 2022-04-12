@@ -1,5 +1,6 @@
 import { Box, Container, Divider, Flex, Skeleton, Spacer, Text } from "@chakra-ui/react";
 import { format } from "date-fns";
+import { useEffect, useState } from "react";
 
 
 interface Transaction {
@@ -11,60 +12,78 @@ interface Transaction {
 }
 
 interface MonthBalanceCardProps {
-  transactions: Transaction[];
+  transactions: Transaction[] | undefined;
+}
+
+interface NewTransactionList {
+  category: string,
+  value: number,
+}
+
+interface TotalSumByCategory {
+  category: string,
+  value: string,
 }
 
 export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardProps) {
 
+  const [totalSumByCategory, setTotalSumByCategory] = useState<TotalSumByCategory[]>();
+
   const currentMonth = format(new Date(), "MMMM");
   const currentYear = new Date().getFullYear();
 
-  const newTransactionList = transactions?.map(val => {
-    return {
-      dt: val.dt,
-      description: val.description,
-      category: val.category,
-      type: val.type,
-      value: val.value,
-      month: format(val.dt, "MMMM")
-    }
-  })
-
-  const allExpenseTransactions = newTransactionList?.filter(val => {
-    if (val.type == "Expense" && val.month === currentMonth) return val.category
-  })
-
-  const arrayOfCategories = allExpenseTransactions?.map(val => { return val.category });
-
-  const arrayOfCategoriesFiltered = arrayOfCategories?.filter((item, position) => {
-    return arrayOfCategories.indexOf(item) == position
-  })
-
-
-  const newTransactionsList = allExpenseTransactions?.map(val => {
-    return {
-      category: val.category,
-      value: Number(val.value)
-    }
-  });
-
-  function returnTotalSumByCategory(category: string) {
-    return newTransactionsList?.reduce((total, transaction) => {
+  function returnTotalSumByCategory(category: string, array: NewTransactionList[]) {
+    return array.reduce((total, transaction) => {
       if (transaction.category == category) {
         total += transaction.value
       }
-
       return total
     }, 0)
-
   }
 
-  const totalSumByCategory = arrayOfCategoriesFiltered?.map(val => {
-    return {
-      category: val,
-      value: returnTotalSumByCategory(val).toFixed(2),
+  useEffect(() => {
+    if (transactions) {
+      const newTransactionList = transactions.map(val => {
+        return {
+          dt: val.dt,
+          description: val.description,
+          category: val.category,
+          type: val.type,
+          value: val.value,
+          month: format(val.dt, "MMMM")
+        }
+      })
+
+      const allExpenseTransactions = newTransactionList.filter(val => {
+        if (val.type == "Expense" && val.month === currentMonth) return val.category
+      })
+
+      const arrayOfCategories = allExpenseTransactions.map(val => { return val.category });
+
+      const arrayOfCategoriesFiltered = arrayOfCategories.filter((item, position) => {
+        return arrayOfCategories.indexOf(item) == position
+      })
+
+
+      const newTransactionsList = allExpenseTransactions.map(val => {
+        return {
+          category: val.category,
+          value: Number(val.value)
+        }
+      });
+
+      const totalSumByCategory = arrayOfCategoriesFiltered?.map(val => {
+        return {
+          category: val,
+          value: returnTotalSumByCategory(val, newTransactionsList).toFixed(2),
+        }
+      })
+
+      setTotalSumByCategory(totalSumByCategory);
+
+
     }
-  })
+  }, [transactions])
 
 
   return (
@@ -72,7 +91,7 @@ export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardPro
       <Text fontWeight="semibold" fontSize={19} pb={4}>Total Expense by Category ({currentMonth}.{currentYear})</Text>
 
       <Skeleton isLoaded={!!transactions}>
-        {transactions ? (
+        {totalSumByCategory ? (
           totalSumByCategory.map(val => {
             return (
               <Flex align="center" pb={4} key={val.category} >
