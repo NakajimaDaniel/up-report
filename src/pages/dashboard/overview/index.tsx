@@ -18,6 +18,9 @@ interface Transaction {
   value: string,
 }
 
+interface TransactionDbResponse {
+  [key: string]: Transaction
+}
 
 export default function Overview() {
 
@@ -32,7 +35,7 @@ export default function Overview() {
       get(child(dbRef, `users/${user.uid}/transactions`)).then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
-          const result = Object.entries(data).map(([key, value]) => { return value });
+          const result = Object.entries(data as TransactionDbResponse).map(([key, value]) => { return value });
           setListOfTransactions(result);
         }
       })
@@ -45,8 +48,14 @@ export default function Overview() {
       <Header />
 
       <VStack mr={width && width > 1180 ? ["100px"] : [0]} ml={width && width > 1180 ? ["100px"] : [0]} pb={10} alignItems="center">
-        <MonthlyBalanceGraph transactions={listOfTransactions} />
-        <AllExpensesPerMonthTable transactions={listOfTransactions} />
+        {listOfTransactions ? (
+          <MonthlyBalanceGraph transactions={listOfTransactions} />
+        ) : (<Container></Container>)}
+
+        {listOfTransactions ? (
+          <AllExpensesPerMonthTable transactions={listOfTransactions} />
+        ) : (<Container></Container>)}
+
       </VStack>
 
     </Container>
