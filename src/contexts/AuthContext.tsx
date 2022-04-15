@@ -55,7 +55,6 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
     await signInWithPopup(auth, provider)
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
         if (result.user) {
           const { uid, displayName, email, photoURL } = result.user;
           if (!displayName || !photoURL) {
