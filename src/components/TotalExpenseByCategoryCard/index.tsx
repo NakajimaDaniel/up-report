@@ -87,7 +87,7 @@ export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardPro
 
 
   return (
-    <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6} >
+    <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6} minH="240px" >
       <Text fontWeight="semibold" fontSize={19} pb={4}>Total Expense by Category ({currentMonth}.{currentYear})</Text>
 
       <Skeleton isLoaded={!!transactions}>
@@ -104,8 +104,8 @@ export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardPro
         ) : (<Container></Container>)}
       </Skeleton>
 
-
-      <Text fontWeight="light" position="relative" bottom="0" right="0" fontSize={13}>Last update 21 Fev 2022 10:10:15</Text>
+      {/* 
+      <Text fontWeight="light" position="relative" bottom="0" right="0" fontSize={13}>Last update 21 Fev 2022 10:10:15</Text> */}
     </Container>
   )
 }
