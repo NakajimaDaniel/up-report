@@ -53,6 +53,21 @@ export function Header() {
         <Flex align="center" pl={5}>
           <Text color="white" fontWeight="bold" fontSize="30px" textAlign="center">UpReport</Text>
           <Spacer />
+          <Popover>
+            <PopoverTrigger>
+              <Skeleton isLoaded={!!user} startColor='pink.500' endColor='orange.500' _hover={{ cursor: "pointer" }} ml={5} >
+                <Image src={user?.photoURL} width="40px" height="40px" mr={3} borderRadius='full' />
+              </Skeleton>
+            </PopoverTrigger>
+            <PopoverContent>
+              <PopoverArrow />
+              <PopoverHeader>Signed in as {user?.displayName}</PopoverHeader>
+              <PopoverBody>
+                <Button onClick={() => handleLogout()} >Sign out</Button>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
+
           <ChakraMenu>
             <MenuButton as={Button} >
               <Icon as={FeatherMenu} />
@@ -76,20 +91,7 @@ export function Header() {
             </MenuList>
           </ChakraMenu>
 
-          <Popover>
-            <PopoverTrigger>
-              <Skeleton isLoaded={!!user} startColor='pink.500' endColor='orange.500' _hover={{ cursor: "pointer" }} ml={5} >
-                <Image src={user?.photoURL} width="40px" height="40px" mr={3} borderRadius='full' />
-              </Skeleton>
-            </PopoverTrigger>
-            <PopoverContent>
-              <PopoverArrow />
-              <PopoverHeader>Signed in as {user?.displayName}</PopoverHeader>
-              <PopoverBody>
-                <Button onClick={() => handleLogout()} >Sign out</Button>
-              </PopoverBody>
-            </PopoverContent>
-          </Popover>
+
 
         </Flex>
 
