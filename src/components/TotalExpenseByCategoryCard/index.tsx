@@ -32,6 +32,8 @@ export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardPro
   const currentMonth = format(new Date(), "MMMM");
   const currentYear = new Date().getFullYear();
 
+  const currentDate = format(new Date(), 'dd MMM yyyy hh:mm:ss aaa');
+
   function returnTotalSumByCategory(category: string, array: NewTransactionList[]) {
     return array.reduce((total, transaction) => {
       if (transaction.category == category) {
@@ -87,25 +89,24 @@ export function TotalExpenseByCategoryCard({ transactions }: MonthBalanceCardPro
 
 
   return (
-    <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6} minH="240px" >
+    <Container w="100%" bg="#364154" borderRadius="10px" pl={6} pr={6} pt={6} minH="240px">
       <Text fontWeight="semibold" fontSize={19} pb={4}>Total Expense by Category ({currentMonth}.{currentYear})</Text>
-
-      <Skeleton isLoaded={!!transactions}>
-        {totalSumByCategory ? (
-          totalSumByCategory.map(val => {
-            return (
-              <Flex align="center" pb={4} key={val.category} >
-                <Text fontWeight="medium" fontSize={16} >{val.category}</Text>
-                <Spacer />
-                <Text fontWeight="medium" fontSize={16} color="#EB4335" >R$ -{val.value}</Text>
-              </Flex>
-            )
-          })
-        ) : (<Container></Container>)}
-      </Skeleton>
-
-      {/* 
-      <Text fontWeight="light" position="relative" bottom="0" right="0" fontSize={13}>Last update 21 Fev 2022 10:10:15</Text> */}
+      <Flex flexDirection="column" h="100%" >
+        <Skeleton isLoaded={!!transactions}>
+          {totalSumByCategory ? (
+            totalSumByCategory.map(val => {
+              return (
+                <Flex align="center" pb={4} key={val.category} >
+                  <Text fontWeight="medium" fontSize={16} >{val.category}</Text>
+                  <Spacer />
+                  <Text fontWeight="medium" fontSize={16} color="#EB4335" >R$ -{val.value}</Text>
+                </Flex>
+              )
+            })
+          ) : (<Container></Container>)}
+        </Skeleton>
+        <Text fontWeight="light" fontSize={13}>Last update {currentDate} </Text>
+      </Flex>
     </Container>
   )
 }
