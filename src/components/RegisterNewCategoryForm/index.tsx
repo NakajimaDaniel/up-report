@@ -3,7 +3,7 @@ import { Formik, Form, Field } from "formik";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useDimensions } from "../../hooks/useDimensions";
-import { database, ref, set, push, get, child, getDatabase } from "../../services/firebase";
+import { database, ref, set, push, get, child, getDatabase, onValue } from "../../services/firebase";
 
 
 
@@ -24,21 +24,21 @@ export function RegisterNewCategoryForm() {
     if (!user) {
       throw new Error('you must be logged in')
     }
-
+    /*
     await set(ref(db, 'users/' + user.uid), {
       userName: user.displayName,
       userEmail: user.email,
-    });
+    }); */
 
-
+    
     const dbRef = ref(getDatabase());
+    
     get(child(dbRef, `users/${user.uid}/categories`)).then((snapshot) => {
       if (snapshot.exists()) {
+
         const data = snapshot.val();
-        const test = Object.entries(data).map(([value]) => { return value });
-
-        const names = test.map((el: any) => el.category)
-
+        const entries = Object.entries(data).map(([key, value]) => { return value });
+        const names = entries.map((el: any) => el.category)
         const isExists = (names.includes(values.category));
 
         if (isExists) {
@@ -62,12 +62,12 @@ export function RegisterNewCategoryForm() {
 
         }
 
-      } else {
-
+      } else  {
+        
         const category = values.category;
-
         const categoryListRef = ref(db, `users/${user.uid}/categories`);
         const newCategoryListRef = push(categoryListRef);
+
         set(newCategoryListRef, {
           category,
         })
@@ -77,14 +77,17 @@ export function RegisterNewCategoryForm() {
           values: {
             category: '',
           }
-        })
-
-      }
+        }) 
+      } 
     }).catch((error) => {
       console.error(error);
     })
-    setIsLoading(false);
+    setIsLoading(false);  
+    
+    
   }
+  
+
 
 
   function ValidateCategoryNameInput(value: string) {
